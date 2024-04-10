@@ -6,7 +6,7 @@ import gradio as gr
 
 from modules import processing, images, shared, sd_samplers
 from modules.processing import process_images, Processed
-from modules.shared import opts, cmd_opts, state, Options
+from modules.shared import opts, cmd_opts, state
 
 import torch
 import cv2
@@ -122,6 +122,10 @@ class Script(scripts.Script):
 			
 			# non-strict, because we only stored decoder weights (not CLIP weights)
 			model.load_state_dict(torch.load(d64_file, map_location=torch.device('cuda')), strict=False);			
+
+			# convert to RGB if the image is in RGBA format
+			if p.init_images[0].mode == 'RGBA':
+				p.init_images[0] = p.init_images[0].convert('RGB')
 
 			transform = transforms.Compose([
 				transforms.ToTensor(),
